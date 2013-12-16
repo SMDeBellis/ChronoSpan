@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Stop Watch</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="title_activity_stop_watch">StopWatch</string>
+    <string name="stop_watch_title_string">Stop Watch</string>
+    <string name="chrono_start_button_string">Start</string>
+    <string name="chrono_stop_button_string">Stop</string>
+    <string name="chrono_reset_button_string">Reset</string>
+    <string name="chrono_lap_button_string">Lap</string>
+    <string name="chrono_format_string">00:00:00</string>
+    <string name="default_lap_time_string">Press Start To Begin</string>
+
+</resources>
