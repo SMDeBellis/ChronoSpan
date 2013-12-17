@@ -6,9 +6,10 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
+    android:background="@color/white"
     tools:context=".MainActivity" >
 
-   	<TextView 
+   <!-- <TextView 
     	android:id="@+id/stop_watch_label_text_view"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -17,14 +18,13 @@
         android:textColor="@color/indigo"
         android:textSize="@dimen/main_banner_text_dimension"
         android:text="@string/stop_watch_title_string" />
-    
+    -->
     <Chronometer
         android:id="@+id/chronometer"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="15dp"
         android:layout_marginRight="15dp"
-        android:layout_below="@id/stop_watch_label_text_view"
         android:textSize="20pt"
         android:textColor="#ffffff"
       	android:gravity="center_horizontal"
@@ -48,6 +48,7 @@
 	        android:layout_height="wrap_content"
 	        android:text="@string/chrono_start_button_string" />
 	    
+	    
 	    <Button 
 	        android:id="@+id/chrono_stop_button"
 	        android:layout_weight="1"
@@ -67,7 +68,7 @@
     <ScrollView 
         android:id="@+id/elapsed_time_scroll_view"
         android:layout_width="fill_parent"
-        android:layout_height="200dp"
+        android:layout_height="300dp"
         android:layout_marginLeft="15dp"
         android:layout_marginRight="15dp"
         android:layout_below="@id/chrono_button_linear_layout"
