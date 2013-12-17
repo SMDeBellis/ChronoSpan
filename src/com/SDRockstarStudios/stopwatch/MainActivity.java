@@ -1,3 +1,6 @@
+//Copyright 2013 Sean DeBellis
+//In association with SDRockstarStudios
+
 package com.SDRockstarStudios.stopwatch;
 
 import android.os.Bundle;
@@ -110,35 +113,33 @@ public class MainActivity extends Activity {
 
 			@Override
 			public void onClick(View v) {
-						
+				
+				//reset chronometer to zero
 				elapsedTime = 0;
 				chrono.setBase(SystemClock.elapsedRealtime() - elapsedTime);
+												
+				//remove all elapsed lap times
+				lapTimes = (LinearLayout) findViewById(R.id.lap_time_linear_layout);
+				lapTimes.removeAllViews();
 				
-				if(firstRun == false){
-								
-					//remove all elapsed lap times
-					lapTimes = (LinearLayout) findViewById(R.id.lap_time_linear_layout);
-					lapTimes.removeAllViews();
-					
-					//redisplay the default lap message
-					defaultLapTextView = new TextView(MainActivity.this);
-					
-					if(running == true){
-						defaultLapTextView.setText("Press lap to save elapsed time");
-					}
-					else{
-						defaultLapTextView.setText("Press Start Button to Start the Timer");
-					}
-					
-					defaultLapTextView.setTextSize(20);
-					defaultLapTextView.setTextColor(Color.WHITE);
-					defaultLapTextView.setGravity(Gravity.CENTER);
-					
-					lapTimes.addView(defaultLapTextView);
-					lapNumber  = 1;
-					firstRun = true;
+				//redisplay the default lap message
+				defaultLapTextView = new TextView(MainActivity.this);
+				
+				if(running == true){
+					defaultLapTextView.setText("Press lap to save elapsed time");
 				}
-								
+				else{
+					defaultLapTextView.setText("Press Start Button to Start the Timer");
+				}
+				
+				defaultLapTextView.setTextSize(20);
+				defaultLapTextView.setTextColor(Color.WHITE);
+				defaultLapTextView.setGravity(Gravity.CENTER);
+				
+				lapTimes.addView(defaultLapTextView);
+				lapNumber  = 1;
+				firstRun = true;
+											
 			}});
 		
 		//--------------------------------------------------------------------

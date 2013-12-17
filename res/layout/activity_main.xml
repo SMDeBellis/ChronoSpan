@@ -46,6 +46,7 @@
 	        android:layout_weight="1"
 	        android:layout_width="0dp"
 	        android:layout_height="wrap_content"
+	        android:textColor="@color/black"
 	        android:text="@string/chrono_start_button_string" />
 	    
 	    
@@ -54,14 +55,16 @@
 	        android:layout_weight="1"
 	        android:layout_width="0dp"
 	        android:layout_height="wrap_content"
-	        android:text="@string/chrono_stop_button_string" />
+	        android:text="@string/chrono_stop_button_string"
+	        android:textColor="@color/black" />
 	    
 	    <Button
 	        android:id="@+id/chrono_reset_button"
 	        android:layout_weight="1"
 	        android:layout_width="0dp"
 	        android:layout_height="wrap_content"
-	        android:text="@string/chrono_reset_button_string" />
+	        android:text="@string/chrono_reset_button_string"
+	        android:textColor="@color/black" />
     </LinearLayout>
     
     
@@ -94,6 +97,7 @@
         android:layout_below="@id/elapsed_time_scroll_view"
         android:layout_marginLeft="15dp"
         android:layout_marginRight="15dp"
-        android:text="@string/chrono_lap_button_string" />
+        android:text="@string/chrono_lap_button_string" 
+        android:textColor="@color/black" />
 
 </RelativeLayout>
