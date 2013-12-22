@@ -5,8 +5,10 @@ package com.SDRockstarStudios.stopwatch;
 
 import android.os.Bundle;
 import android.os.SystemClock;
-import android.app.Activity;
 import android.graphics.Color;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.view.ViewPager;
+import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
@@ -14,11 +16,13 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.Chronometer;
-import android.widget.LinearLayout;
 import android.widget.ScrollView;
+import android.widget.TabHost;
+import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TextView;
+import android.widget.TabHost.TabSpec;
 
-public class MainActivity extends Activity {
+public class MainActivity extends FragmentActivity {
 
 	Chronometer chrono = null;
 	
@@ -26,11 +30,15 @@ public class MainActivity extends Activity {
 	Button stopButton = null;
 	Button resetButton = null;
 	Button lapButton = null;
-
-	TextView defaultLapTextView = null;
-	ScrollView lapScrollView = null;
-	LinearLayout lapTimes = null;
 	
+	TabHost tabs = null;
+	LapPagerAdapter lapPagerAdapter = null;
+	ViewPager viewPager = null;
+		
+	ScrollView lapFragScrollView = null;
+	ScrollView elapsedFragScrollView = null;
+	TextView defaultLapTextView = null;
+	TextView add = null;
 	long elapsedTime = 0;
 	int lapNumber = 1;
 	
@@ -49,21 +57,73 @@ public class MainActivity extends Activity {
 		resetButton = (Button) findViewById(R.id.chrono_reset_button);
 		lapButton = (Button) findViewById(R.id.chrono_lap_button);
 		
-		// create the default message for the lap scroll view
-		defaultLapTextView = new TextView(this);
-		defaultLapTextView.setText("Press the Start Button to Begin the Timer");
-		defaultLapTextView.setTextSize(20);
-		defaultLapTextView.setTextColor(Color.WHITE);
-		defaultLapTextView.setGravity(Gravity.CENTER);
+		tabs = (TabHost) findViewById(android.R.id.tabhost);
+		tabs.setup();
 		
-		lapScrollView = (ScrollView) findViewById(R.id.elapsed_time_scroll_view);
+		TabSpec lapTab = tabs.newTabSpec("0");
+		lapTab.setContent(R.id.tab1);
+		lapTab.setIndicator("Lap");
+		tabs.addTab(lapTab);
 		
-		lapTimes = (LinearLayout) findViewById(R.id.lap_time_linear_layout);
-		lapTimes.addView(defaultLapTextView);
+		TabSpec elapsedTab = tabs.newTabSpec("1");
+		elapsedTab.setContent(R.id.tab2);
+		elapsedTab.setIndicator("Elapsed");
+		tabs.addTab(elapsedTab);
 		
+		tabs.setBackgroundColor(Color.DKGRAY);
+		tabs.setOnTabChangedListener(new OnTabChangeListener(){
+
+			@Override
+			public void onTabChanged(String tabId) {
+				// TODO Auto-generated method stub
+				int intTabId = Integer.parseInt(tabId);
+				viewPager.setCurrentItem(intTabId);
+				
+			}});
+	
+	
+		lapPagerAdapter = new LapPagerAdapter(getSupportFragmentManager());
+		
+		viewPager = (ViewPager) findViewById(R.id.swipe_panel_pager);
+		viewPager.setAdapter(lapPagerAdapter);
+		viewPager.setOnPageChangeListener(new OnPageChangeListener(){
+
+			@Override
+			public void onPageScrollStateChanged(int arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void onPageScrolled(int arg0, float arg1, int arg2) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void onPageSelected(int arg0) {
+				// TODO Auto-generated method stub
+				tabs.setCurrentTab(arg0);
+		}});// end of OnPageChangeListener
+		
+			
 		chrono.setText("00:00");
-		
+
 		setButtonOnClickListeners();		
+	}
+	
+	//-----------------------------------------------------------------------
+	public LapFragment getLapFragment(){
+		
+		LapFragment lapFrag = (LapFragment) getSupportFragmentManager().findFragmentByTag("android:switcher:"+R.id.swipe_panel_pager+":0");
+		return lapFrag;
+	}
+
+	//--------------------------------------------------------------------------
+	public ElapsedFragment getElapsedFragment(){
+		
+		ElapsedFragment elapsedFrag = (ElapsedFragment) getSupportFragmentManager().findFragmentByTag("android:switcher:"+R.id.swipe_panel_pager+":1");
+		return elapsedFrag;
 	}
 	
 	//-----------------------------------------------------------------------
@@ -89,11 +149,19 @@ public class MainActivity extends Activity {
 								+ Integer.parseInt(array[2]) * 1000;
 					}
 			      
+					LapFragment lapFrag = getLapFragment();
+					lapFrag.removeAllLaps();
+					
+					ElapsedFragment elapsedFrag = getElapsedFragment();
+					elapsedFrag.removeAllLaps();
+					
 					chrono.setBase(SystemClock.elapsedRealtime() - elapsedTime);
 					chrono.start();
 			     
-					defaultLapTextView.setText("Press lap to save elapsed time");
 					running = true;
+					
+					lapFrag.resetDefaultLaps(running);
+					elapsedFrag.resetDefaultView(running);
 				}
 			}});
 		
@@ -105,6 +173,13 @@ public class MainActivity extends Activity {
 				
 				chrono.stop();
 				running = false;
+				
+				if(firstRun){
+					LapFragment lapFrag = getLapFragment();
+					lapFrag.resetDefaultLaps(running);
+					ElapsedFragment elapsedFrag = getElapsedFragment();
+					elapsedFrag.resetDefaultView(running);
+				}
 				
 			}});
 		
@@ -119,8 +194,7 @@ public class MainActivity extends Activity {
 				chrono.setBase(SystemClock.elapsedRealtime() - elapsedTime);
 												
 				//remove all elapsed lap times
-				lapTimes = (LinearLayout) findViewById(R.id.lap_time_linear_layout);
-				lapTimes.removeAllViews();
+				
 				
 				//redisplay the default lap message
 				defaultLapTextView = new TextView(MainActivity.this);
@@ -136,7 +210,12 @@ public class MainActivity extends Activity {
 				defaultLapTextView.setTextColor(Color.WHITE);
 				defaultLapTextView.setGravity(Gravity.CENTER);
 				
-				lapTimes.addView(defaultLapTextView);
+				LapFragment lapFrag = getLapFragment();
+				lapFrag.resetDefaultLaps(running);
+				
+				ElapsedFragment elapsedFrag = getElapsedFragment();
+				elapsedFrag.resetDefaultView(running);
+								
 				lapNumber  = 1;
 				firstRun = true;
 											
@@ -150,25 +229,19 @@ public class MainActivity extends Activity {
 							
 				if(running == true){
 					
-					defaultLapTextView.setVisibility(View.GONE);
+					String timeString = chrono.getText().toString();
 					
-					TextView toAdd = new TextView(MainActivity.this);
-					toAdd.setText("Lap " + String.valueOf(lapNumber) + ": "+ chrono.getText().toString());
-					toAdd.setTextSize(40);
-					toAdd.setTextColor(Color.LTGRAY);
-					toAdd.setGravity(Gravity.CENTER);
+					LapFragment lapFrag = getLapFragment();
+					ElapsedFragment elapsedFrag = getElapsedFragment();
 					
-					lapTimes.addView(toAdd);
+					if(firstRun){
+						lapFrag.removeAllLaps();
+						elapsedFrag.removeAllLaps();
+					}
 					
-					// scrolls to the bottom of the ScrollView when the new TextView is added
-					lapScrollView.post(new Runnable(){
-
-						@Override
-						public void run() {
-							
-							lapScrollView.fullScroll(ScrollView.FOCUS_DOWN);
-						}});
-					
+					lapFrag.addLap(timeString, lapNumber);
+					elapsedFrag.addLaps(timeString, lapNumber);
+										
 					lapNumber++;
 					
 					firstRun = false;

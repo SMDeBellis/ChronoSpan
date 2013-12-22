@@ -32,18 +32,26 @@ public final class R {
         public static final int rounded_view=0x7f020001;
     }
     public static final class id {
-        public static final int action_settings=0x7f090008;
+        public static final int action_settings=0x7f09000e;
         public static final int chrono_button_linear_layout=0x7f090001;
-        public static final int chrono_lap_button=0x7f090007;
+        public static final int chrono_lap_button=0x7f090009;
         public static final int chrono_reset_button=0x7f090004;
         public static final int chrono_start_button=0x7f090002;
         public static final int chrono_stop_button=0x7f090003;
         public static final int chronometer=0x7f090000;
-        public static final int elapsed_time_scroll_view=0x7f090005;
-        public static final int lap_time_linear_layout=0x7f090006;
+        public static final int elapsed_frag_scroll_view=0x7f09000a;
+        public static final int elapsed_time_linear_layout=0x7f09000b;
+        public static final int lap_elapsed_time_linear_layout=0x7f090005;
+        public static final int lap_frag_linear_layout=0x7f09000d;
+        public static final int lap_frag_scroll_view=0x7f09000c;
+        public static final int swipe_panel_pager=0x7f090008;
+        public static final int tab1=0x7f090006;
+        public static final int tab2=0x7f090007;
     }
     public static final class layout {
         public static final int activity_main=0x7f030000;
+        public static final int fragment_elapsed=0x7f030001;
+        public static final int fragment_lap_fagment=0x7f030002;
     }
     public static final class menu {
         public static final int main=0x7f080000;
@@ -57,6 +65,7 @@ public final class R {
         public static final int chrono_start_button_string=0x7f060004;
         public static final int chrono_stop_button_string=0x7f060005;
         public static final int default_lap_time_string=0x7f060009;
+        public static final int hello_blank_fragment=0x7f06000a;
         public static final int stop_watch_title_string=0x7f060003;
         public static final int title_activity_stop_watch=0x7f060002;
     }
