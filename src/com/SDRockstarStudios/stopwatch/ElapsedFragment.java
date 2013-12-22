@@ -43,6 +43,24 @@ public class ElapsedFragment extends Fragment {
 		return layoutView;
 	}
 	
+	//---------------------------------------------------
+	public void setScrollPosition(int xPos, int yPos){
+		
+		scrollView.scrollTo(xPos, yPos);
+	}
+	
+	//-----------------------------------------------------
+	public int getScrollViewXPos(){
+		
+		return scrollView.getScrollX();
+	}
+	
+	//----------------------------------------------------
+	public int getScrollViewYPos(){
+		
+		return scrollView.getScrollY();
+		
+	}
 	//-------------------------------------------------------
 	private long getTimeInMilliSec(String time){
 				

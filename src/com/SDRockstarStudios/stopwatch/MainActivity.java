@@ -91,6 +91,27 @@ public class MainActivity extends FragmentActivity {
 			@Override
 			public void onPageScrollStateChanged(int arg0) {
 				// TODO Auto-generated method stub
+				LapFragment lapFrag = getLapFragment();
+				ElapsedFragment elapsedFrag = getElapsedFragment();
+				
+				int currentPage = viewPager.getCurrentItem();
+				int xPos;
+				int yPos;
+				
+				if(currentPage == 0){
+								
+					xPos = lapFrag.getScrollViewXPos();
+					yPos = lapFrag.getScrollViewYPos();
+					
+					elapsedFrag.setScrollPosition(xPos, yPos);
+				}
+				else if(currentPage == 1){
+					
+					xPos = elapsedFrag.getScrollViewXPos();
+					yPos = elapsedFrag.getScrollViewYPos();
+					
+					lapFrag.setScrollPosition(xPos, yPos);					
+				}
 				
 			}
 
@@ -108,7 +129,7 @@ public class MainActivity extends FragmentActivity {
 		
 			
 		chrono.setText("00:00");
-
+		
 		setButtonOnClickListeners();		
 	}
 	

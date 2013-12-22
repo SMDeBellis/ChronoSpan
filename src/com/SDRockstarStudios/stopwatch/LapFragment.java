@@ -48,7 +48,24 @@ public class LapFragment extends Fragment {
 	}
 
 	//------------------------------------------------------------------------
+	public void setScrollPosition(int xPos, int yPos){
+		
+		scrollView.scrollTo(xPos, yPos);	
+		
+	}
 	
+	//---------------------------------------------
+	public int getScrollViewXPos(){
+		
+		return scrollView.getScrollX();
+	}
+	
+	//------------------------------------------------
+	public int getScrollViewYPos(){
+		
+		return scrollView.getScrollY();
+	}
+	//--------------------------------------------------------------------
 	public void addLap(String time, int lapNumber){
 		
 		TextView toAdd = new TextView(getActivity());
