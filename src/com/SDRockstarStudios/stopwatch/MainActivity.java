@@ -37,8 +37,7 @@ public class MainActivity extends FragmentActivity {
 		
 	ScrollView lapFragScrollView = null;
 	ScrollView elapsedFragScrollView = null;
-	TextView defaultLapTextView = null;
-	TextView add = null;
+	
 	long elapsedTime = 0;
 	int lapNumber = 1;
 	
@@ -62,7 +61,7 @@ public class MainActivity extends FragmentActivity {
 		
 		TabSpec lapTab = tabs.newTabSpec("0");
 		lapTab.setContent(R.id.tab1);
-		lapTab.setIndicator("Lap");
+		lapTab.setIndicator("Laps");
 		tabs.addTab(lapTab);
 		
 		TabSpec elapsedTab = tabs.newTabSpec("1");
@@ -70,14 +69,16 @@ public class MainActivity extends FragmentActivity {
 		elapsedTab.setIndicator("Elapsed");
 		tabs.addTab(elapsedTab);
 		
-		tabs.setBackgroundColor(Color.DKGRAY);
+		tabs.setBackgroundColor(Color.BLACK);
 		tabs.setOnTabChangedListener(new OnTabChangeListener(){
 
 			@Override
 			public void onTabChanged(String tabId) {
 				// TODO Auto-generated method stub
 				int intTabId = Integer.parseInt(tabId);
+				syncFragmentScrolls();
 				viewPager.setCurrentItem(intTabId);
+				
 				
 			}});
 	
@@ -91,27 +92,8 @@ public class MainActivity extends FragmentActivity {
 			@Override
 			public void onPageScrollStateChanged(int arg0) {
 				// TODO Auto-generated method stub
-				LapFragment lapFrag = getLapFragment();
-				ElapsedFragment elapsedFrag = getElapsedFragment();
-				
-				int currentPage = viewPager.getCurrentItem();
-				int xPos;
-				int yPos;
-				
-				if(currentPage == 0){
 								
-					xPos = lapFrag.getScrollViewXPos();
-					yPos = lapFrag.getScrollViewYPos();
-					
-					elapsedFrag.setScrollPosition(xPos, yPos);
-				}
-				else if(currentPage == 1){
-					
-					xPos = elapsedFrag.getScrollViewXPos();
-					yPos = elapsedFrag.getScrollViewYPos();
-					
-					lapFrag.setScrollPosition(xPos, yPos);					
-				}
+				syncFragmentScrolls();
 				
 			}
 
@@ -147,6 +129,33 @@ public class MainActivity extends FragmentActivity {
 		return elapsedFrag;
 	}
 	
+	//----------------------------------------------------------------------------
+	private void syncFragmentScrolls(){
+		
+		LapFragment lapFrag = getLapFragment();
+		ElapsedFragment elapsedFrag = getElapsedFragment();
+		
+		int currentPage = viewPager.getCurrentItem();
+		int xPos;
+		int yPos;
+		
+		if(currentPage == 0){
+						
+			xPos = lapFrag.getScrollViewXPos();
+			yPos = lapFrag.getScrollViewYPos();
+			
+			elapsedFrag.setScrollPosition(xPos, yPos);
+		}
+		else if(currentPage == 1){
+			
+			xPos = elapsedFrag.getScrollViewXPos();
+			yPos = elapsedFrag.getScrollViewYPos();
+			
+			lapFrag.setScrollPosition(xPos, yPos);					
+		}
+		
+		
+	}
 	//-----------------------------------------------------------------------
 	public void setButtonOnClickListeners(){
 		
@@ -158,9 +167,9 @@ public class MainActivity extends FragmentActivity {
 				
 				if(running == false){
 					String chronoText = chrono.getText().toString();
-					Log.w("chrono output", chrono.getText().toString());
+					//Log.w("chrono output", chrono.getText().toString());
 					String array[] = chronoText.split(":");
-			      
+								      
 					if (array.length == 2){ 
 						elapsedTime = Integer.parseInt(array[0]) * 60 * 1000
 								+ Integer.parseInt(array[1]) * 1000;
@@ -171,18 +180,20 @@ public class MainActivity extends FragmentActivity {
 					}
 			      
 					LapFragment lapFrag = getLapFragment();
-					lapFrag.removeAllLaps();
-					
 					ElapsedFragment elapsedFrag = getElapsedFragment();
-					elapsedFrag.removeAllLaps();
+					
+					
 					
 					chrono.setBase(SystemClock.elapsedRealtime() - elapsedTime);
 					chrono.start();
 			     
 					running = true;
 					
-					lapFrag.resetDefaultLaps(running);
-					elapsedFrag.resetDefaultView(running);
+					if(firstRun){
+						lapFrag.resetDefaultLaps(running);
+						elapsedFrag.resetDefaultView(running);
+					}
+					
 				}
 			}});
 		
@@ -218,19 +229,6 @@ public class MainActivity extends FragmentActivity {
 				
 				
 				//redisplay the default lap message
-				defaultLapTextView = new TextView(MainActivity.this);
-				
-				if(running == true){
-					defaultLapTextView.setText("Press lap to save elapsed time");
-				}
-				else{
-					defaultLapTextView.setText("Press Start Button to Start the Timer");
-				}
-				
-				defaultLapTextView.setTextSize(20);
-				defaultLapTextView.setTextColor(Color.WHITE);
-				defaultLapTextView.setGravity(Gravity.CENTER);
-				
 				LapFragment lapFrag = getLapFragment();
 				lapFrag.resetDefaultLaps(running);
 				
@@ -251,7 +249,7 @@ public class MainActivity extends FragmentActivity {
 				if(running == true){
 					
 					String timeString = chrono.getText().toString();
-					
+					//Log.d("timeString", timeString);
 					LapFragment lapFrag = getLapFragment();
 					ElapsedFragment elapsedFrag = getElapsedFragment();
 					

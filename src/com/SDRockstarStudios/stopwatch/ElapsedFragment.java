@@ -73,7 +73,7 @@ public class ElapsedFragment extends Fragment {
 		else if(timeArray.length == 3)
 			elapsedTime = (Integer.parseInt(timeArray[0]) * 60 * 60 * 1000 
 					+ Integer.parseInt(timeArray[1]) * 60 * 1000
-					+ Integer.parseInt(timeArray[3]) * 1000);
+					+ Integer.parseInt(timeArray[2]) * 1000);
 		
 		
 		return elapsedTime;
@@ -85,13 +85,18 @@ public class ElapsedFragment extends Fragment {
 		String timeString = null;
 		
 		long time = timeInMilliSec;
+		long hrs = 0;
 		long mins = 0;
 		long secs = 0;
 		
 		secs = (time / 1000) % 60;
 		mins = (time / (60 * 1000)) % 60;
+		hrs = (time/ (60 * 60 * 1000)) % 100;
 		
-		timeString = String.format("%02d:%02d", mins, secs);		
+		if(hrs > 0)
+			timeString = String.format("%02d:%02d:%02d", hrs, mins, secs);
+		else
+			timeString = String.format("%02d:%02d", mins, secs);		
 		
 		return timeString;
 	}
