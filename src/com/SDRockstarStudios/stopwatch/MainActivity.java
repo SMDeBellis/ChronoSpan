@@ -9,8 +9,6 @@ import android.graphics.Color;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
-import android.util.Log;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -19,7 +17,6 @@ import android.widget.Chronometer;
 import android.widget.ScrollView;
 import android.widget.TabHost;
 import android.widget.TabHost.OnTabChangeListener;
-import android.widget.TextView;
 import android.widget.TabHost.TabSpec;
 
 public class MainActivity extends FragmentActivity {
