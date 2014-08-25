@@ -10,10 +10,11 @@
     tools:context=".MainActivity" >
 
     
-   <Chronometer
+   <com.SDRockstarStudios.stopwatch.Chrono
         android:id="@+id/chronometer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:text="@string/chrono_format_string"
         android:layout_marginLeft="15dp"
         android:layout_marginRight="15dp"
         android:background="@drawable/rounded_view"

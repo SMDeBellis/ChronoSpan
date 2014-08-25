@@ -13,7 +13,6 @@ import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
-import android.widget.Chronometer;
 import android.widget.ScrollView;
 import android.widget.TabHost;
 import android.widget.TabHost.OnTabChangeListener;
@@ -21,7 +20,7 @@ import android.widget.TabHost.TabSpec;
 
 public class MainActivity extends FragmentActivity {
 
-	Chronometer chrono = null;
+	Chrono chrono = null;
 	
 	Button startButton = null;
 	Button stopButton = null;
@@ -36,6 +35,8 @@ public class MainActivity extends FragmentActivity {
 	ScrollView elapsedFragScrollView = null;
 	
 	long elapsedTime = 0;
+	long startPause = 0;
+	long endPause = 0;
 	int lapNumber = 1;
 	
 	boolean running = false; // tells if the timer is running
@@ -46,7 +47,7 @@ public class MainActivity extends FragmentActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
-		chrono = (Chronometer) findViewById(R.id.chronometer);
+		chrono = (Chrono) findViewById(R.id.chronometer);
 		
 		startButton = (Button) findViewById(R.id.chrono_start_button);
 		stopButton = (Button) findViewById(R.id.chrono_stop_button);
@@ -107,7 +108,7 @@ public class MainActivity extends FragmentActivity {
 		}});// end of OnPageChangeListener
 		
 			
-		chrono.setText("00:00");
+		//chrono.setText("00:00:00:00");
 		
 		setButtonOnClickListeners();		
 	}
@@ -179,20 +180,21 @@ public class MainActivity extends FragmentActivity {
 					LapFragment lapFrag = getLapFragment();
 					ElapsedFragment elapsedFrag = getElapsedFragment();
 					
-					
-					
-					chrono.setBase(SystemClock.elapsedRealtime() - elapsedTime);
-					chrono.start();
-			     
 					running = true;
 					
 					if(firstRun){
+						chrono.setBase(SystemClock.elapsedRealtime() - elapsedTime);
 						lapFrag.resetDefaultLaps(running);
 						elapsedFrag.resetDefaultView(running);
+						firstRun = false;
+					} else {
+						endPause = SystemClock.elapsedRealtime();
+						chrono.setBase(chrono.getBase() + (endPause - startPause));
 					}
-					
+						
+					chrono.start();					
 				}
-			}});
+		}});
 		
 		//-----------------------------------------------------------------
 		stopButton.setOnClickListener(new OnClickListener(){
@@ -201,6 +203,7 @@ public class MainActivity extends FragmentActivity {
 			public void onClick(View v) {
 				
 				chrono.stop();
+				startPause = SystemClock.elapsedRealtime();
 				running = false;
 				
 				if(firstRun){
@@ -209,7 +212,6 @@ public class MainActivity extends FragmentActivity {
 					ElapsedFragment elapsedFrag = getElapsedFragment();
 					elapsedFrag.resetDefaultView(running);
 				}
-				
 			}});
 		
 		//-----------------------------------------------------------------
