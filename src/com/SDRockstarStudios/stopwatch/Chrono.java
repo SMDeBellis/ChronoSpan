@@ -11,7 +11,13 @@ import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.RemoteViews.RemoteView;
 import android.widget.TextView;
-
+/**
+ * Modified version of the Chronometer widget
+ * found in the android sdk to output time in 
+ * centiseconds
+ * @author graveyard
+ *
+ */
 @SuppressLint({ "NewApi", "HandlerLeak" })
 @RemoteView
 public class Chrono extends TextView {
@@ -31,10 +37,9 @@ public class Chrono extends TextView {
     }
 
     private long base;
-    private long pauseBase;
     private boolean visible;
     private boolean started;
-    private boolean mRunning;
+    private boolean running;
     
         
     private onChronoTickListener onChronoTickListener;
@@ -70,7 +75,6 @@ public class Chrono extends TextView {
     private void init() {
         this.base = SystemClock.elapsedRealtime();
         updateText(this.base);
-        Log.d("init called, base", String.valueOf(this.base));
     }
 
     /**
@@ -83,8 +87,7 @@ public class Chrono extends TextView {
         this.base = base;
         dispatchChronometerTick();
         updateText(SystemClock.elapsedRealtime());
-        Log.d("setBase called", "base = " + base);
-     }
+    }
 
     /**
      * Return the base time as set through {@link #setBase}.
@@ -100,7 +103,6 @@ public class Chrono extends TextView {
      */
     public void setOnChronoTickListener(onChronoTickListener listener) {
         this.onChronoTickListener = listener;
-        Log.d("setOnChronoTickListener called", "called");
     }
 
     /**
@@ -108,9 +110,7 @@ public class Chrono extends TextView {
      *         events.
      */
     public onChronoTickListener getOnChronoTickListener() {
-    	Log.d("getOnChronoTickListener called", "");
     	return this.onChronoTickListener;
-        
     }
 
     /**
@@ -122,10 +122,8 @@ public class Chrono extends TextView {
      * make sure that each start() call has a reciprocal call to {@link #stop}. 
      */
     public void start() {
-    	Log.d("start called", "");
     	this.started = true;
-    	updateRunning();
-    	
+    	updateRunning();    	
     }
 
     /**
@@ -136,21 +134,11 @@ public class Chrono extends TextView {
      * be held as the chronometer is running, via {@link #start}. 
      */
     public void stop() {
-    	Log.d("stop called", "");
         this.started = false;
         updateRunning();
     }
 
-    /**
-     * The same as calling {@link #start} or {@link #stop}.
-     * @hide pending API council approvalvalue
-     */
     
-    /*public void setStarted(boolean started) {
-        this.started = started;
-        updateRunning();
-    }*/
-
     @Override
     protected void onDetachedFromWindow() {
     	Log.d("onDetachedFromWindow called", "");
@@ -168,8 +156,7 @@ public class Chrono extends TextView {
     }
 
     private synchronized void updateText(long now) {
-    	Log.d("updateText called", "");
-        long seconds = now - this.base;
+    	long seconds = now - this.base;
 
         String text;
         String hrStr;
@@ -220,28 +207,27 @@ public class Chrono extends TextView {
               	
         text = hrStr + ":"  + minStr + ":" +
         	   secStr + ":" + centiStr;
-        Log.d("output of text in updateText", text);
+        
         setText(text);
     }
 
     private void updateRunning() {
-    	Log.d("updateRunning called", "");
-        boolean running = this.visible && this.started;
-        if (running != mRunning) {
-            if (running) {
+    	boolean isRunning = this.visible && this.started;
+        if (isRunning != running) {
+            if (isRunning) {
                 updateText(SystemClock.elapsedRealtime());
                 dispatchChronometerTick();
                 handler.sendMessageDelayed(Message.obtain(handler, TICK_WHAT), 10);
             } else {
                 handler.removeMessages(TICK_WHAT);
             }
-            mRunning = running;
+            running = isRunning;
         }
     }
     
 	private Handler handler = new Handler() {
         public void handleMessage(Message m) {
-            if (mRunning) {
+            if (running) {
                 updateText(SystemClock.elapsedRealtime());
                 dispatchChronometerTick();
                 sendMessageDelayed(Message.obtain(this, TICK_WHAT), 10);

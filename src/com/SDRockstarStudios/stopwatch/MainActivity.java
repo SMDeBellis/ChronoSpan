@@ -40,7 +40,8 @@ public class MainActivity extends FragmentActivity {
 	int lapNumber = 1;
 	
 	boolean running = false; // tells if the timer is running
-	boolean firstRun = true; // tells if any laps have been recorded
+	boolean firstRun = true; // tells if its the first run since app start or reset
+	boolean hasLap = false; // tells if any laps have been recorded 
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -106,10 +107,7 @@ public class MainActivity extends FragmentActivity {
 				// TODO Auto-generated method stub
 				tabs.setCurrentTab(arg0);
 		}});// end of OnPageChangeListener
-		
-			
-		//chrono.setText("00:00:00:00");
-		
+				
 		setButtonOnClickListeners();		
 	}
 	
@@ -165,33 +163,42 @@ public class MainActivity extends FragmentActivity {
 				
 				if(running == false){
 					String chronoText = chrono.getText().toString();
-					//Log.w("chrono output", chrono.getText().toString());
 					String array[] = chronoText.split(":");
-								      
-					if (array.length == 2){ 
-						elapsedTime = Integer.parseInt(array[0]) * 60 * 1000
-								+ Integer.parseInt(array[1]) * 1000;
-					} else if (array.length == 3) {
-						elapsedTime = Integer.parseInt(array[0]) * 60 * 60 * 1000 
-								+ Integer.parseInt(array[1]) * 60 * 1000
-								+ Integer.parseInt(array[2]) * 1000;
-					}
-			      
-					LapFragment lapFrag = getLapFragment();
-					ElapsedFragment elapsedFrag = getElapsedFragment();
+													      					
+					elapsedTime = Integer.parseInt(array[0]) * 3600000 
+							+ Integer.parseInt(array[1]) * 60000
+							+ Integer.parseInt(array[2]) * 1000
+					        + Integer.parseInt(array[3]) * 10;
 					
 					running = true;
 					
-					if(firstRun){
+					if(firstRun)
+					/**
+					 * Start the clock from 00:00:00:00
+					 */
+					{
 						chrono.setBase(SystemClock.elapsedRealtime() - elapsedTime);
-						lapFrag.resetDefaultLaps(running);
-						elapsedFrag.resetDefaultView(running);
 						firstRun = false;
-					} else {
+					} else 
+					/**
+					 * Start the clock from previously stopped time
+					 */
+					{
 						endPause = SystemClock.elapsedRealtime();
 						chrono.setBase(chrono.getBase() + (endPause - startPause));
 					}
-						
+					
+					/**
+					 * If no laps have been recorded switch message in view to its
+					 * proper state:
+					 * In this case it would be "press lap button to record laps"
+					 */
+					if(hasLap == false){
+						LapFragment lapFrag = getLapFragment();
+						ElapsedFragment elapsedFrag = getElapsedFragment();
+						lapFrag.resetDefaultLaps(running);
+						elapsedFrag.resetDefaultView(running);
+					}
 					chrono.start();					
 				}
 		}});
@@ -203,10 +210,21 @@ public class MainActivity extends FragmentActivity {
 			public void onClick(View v) {
 				
 				chrono.stop();
+				
+				/**
+				 * Record the time at which the time has been stopped so 
+				 * if the timer is started it can adjust for the time passed
+				 * while paused
+				 */
 				startPause = SystemClock.elapsedRealtime();
 				running = false;
 				
-				if(firstRun){
+				/**
+				 * If no laps have been recorded switch message in view to its
+				 * proper state:
+				 * In this case it would be "press start button to start timer"
+				 */
+				if(hasLap == false){
 					LapFragment lapFrag = getLapFragment();
 					lapFrag.resetDefaultLaps(running);
 					ElapsedFragment elapsedFrag = getElapsedFragment();
@@ -220,22 +238,26 @@ public class MainActivity extends FragmentActivity {
 			@Override
 			public void onClick(View v) {
 				
-				//reset chronometer to zero
+				/**
+				 * reset milliseconds to zero and reset the chronometer to 
+				 * 00:00:00:00
+				 */
 				elapsedTime = 0;
 				chrono.setBase(SystemClock.elapsedRealtime() - elapsedTime);
 												
-				//remove all elapsed lap times
-				
-				
-				//redisplay the default lap message
+				/**
+				 * remove all lap times and redisplay the default lap messages
+				 * the state of which depends on if the chronometer is still 
+				 * running or if it is stopped.	
+				 */
 				LapFragment lapFrag = getLapFragment();
 				lapFrag.resetDefaultLaps(running);
-				
 				ElapsedFragment elapsedFrag = getElapsedFragment();
 				elapsedFrag.resetDefaultView(running);
 								
-				lapNumber  = 1;
-				firstRun = true;
+				lapNumber  = 1; // reset the lap number back to 1
+				firstRun = true; // reset to first run since reset
+				hasLap = false; // restet to having no laps recorded
 											
 			}});
 		
@@ -252,7 +274,7 @@ public class MainActivity extends FragmentActivity {
 					LapFragment lapFrag = getLapFragment();
 					ElapsedFragment elapsedFrag = getElapsedFragment();
 					
-					if(firstRun){
+					if(lapNumber == 1){
 						lapFrag.removeAllLaps();
 						elapsedFrag.removeAllLaps();
 					}
@@ -262,7 +284,8 @@ public class MainActivity extends FragmentActivity {
 										
 					lapNumber++;
 					
-					firstRun = false;
+					//firstRun = false;
+					hasLap = true;
 				}
 			}});
 	}

@@ -1,5 +1,7 @@
 package com.SDRockstarStudios.stopwatch;
 
+import java.util.Locale;
+
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -16,7 +18,7 @@ public class ElapsedFragment extends Fragment {
 	
 	ScrollView scrollView = null;
 	LinearLayout linearLayout = null;
-	private static String lastRecordedTime = "00:00"; 
+	private static String lastRecordedTime = "00:00:00:00"; 
 	public ElapsedFragment() {
 		// Required empty public constructor
 	}
@@ -67,14 +69,11 @@ public class ElapsedFragment extends Fragment {
 		long elapsedTime = 0;
 		
 		String timeArray[] = time.split(":");
-		if(timeArray.length == 2)
-			elapsedTime = (Integer.parseInt(timeArray[0]) * 60 * 1000
-					+ Integer.parseInt(timeArray[1]) * 1000);
-		else if(timeArray.length == 3)
-			elapsedTime = (Integer.parseInt(timeArray[0]) * 60 * 60 * 1000 
-					+ Integer.parseInt(timeArray[1]) * 60 * 1000
-					+ Integer.parseInt(timeArray[2]) * 1000);
 		
+		elapsedTime = (Integer.parseInt(timeArray[0]) * 60 * 60 * 1000 
+					+ Integer.parseInt(timeArray[1]) * 60 * 1000
+					+ Integer.parseInt(timeArray[2]) * 1000		
+					+ Integer.parseInt(timeArray[3]) * 10);
 		
 		return elapsedTime;
 	}
@@ -88,16 +87,15 @@ public class ElapsedFragment extends Fragment {
 		long hrs = 0;
 		long mins = 0;
 		long secs = 0;
+		long millis = 0;
 		
+		millis = (time/ 10) % 100;
 		secs = (time / 1000) % 60;
 		mins = (time / (60 * 1000)) % 60;
 		hrs = (time/ (60 * 60 * 1000)) % 100;
 		
-		if(hrs > 0)
-			timeString = String.format("%02d:%02d:%02d", hrs, mins, secs);
-		else
-			timeString = String.format("%02d:%02d", mins, secs);		
-		
+		timeString = String.format(Locale.getDefault(), "%02d:%02d:%02d:%02d", hrs, mins, secs, millis);
+			
 		return timeString;
 	}
 	//-------------------------------------------------------
@@ -125,9 +123,7 @@ public class ElapsedFragment extends Fragment {
 
 			@Override
 			public void run() {
-				
-				scrollView.fullScroll(ScrollView.FOCUS_DOWN);
-				
+				scrollView.fullScroll(ScrollView.FOCUS_DOWN);				
 			}});
 	}
 	
@@ -135,13 +131,13 @@ public class ElapsedFragment extends Fragment {
 	public void removeAllLaps(){
 		
 		linearLayout.removeAllViews();
-		lastRecordedTime = "00:00";
+		lastRecordedTime = "00:00:00:00";
 	}
 	
 	//-----------------------------------------------------
 	public void resetDefaultView(boolean timerIsRunning){
 		
-	removeAllLaps();
+		removeAllLaps();
 		
 		TextView startingTextView = (TextView) new TextView(getActivity());
 		
