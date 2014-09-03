@@ -9,17 +9,22 @@ import android.graphics.Color;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
-import android.widget.ScrollView;
+import android.widget.LinearLayout;
 import android.widget.TabHost;
 import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TabHost.TabSpec;
+import android.widget.TextView;
 
 public class MainActivity extends FragmentActivity {
-
+	
+	boolean isDualPane; //to differentiate between small and large screen functionality
+	
 	Chrono chrono = null;
 	
 	Button startButton = null;
@@ -30,9 +35,6 @@ public class MainActivity extends FragmentActivity {
 	TabHost tabs = null;
 	LapPagerAdapter lapPagerAdapter = null;
 	ViewPager viewPager = null;
-		
-	ScrollView lapFragScrollView = null;
-	ScrollView elapsedFragScrollView = null;
 	
 	long elapsedTime = 0;
 	long startPause = 0;
@@ -56,58 +58,71 @@ public class MainActivity extends FragmentActivity {
 		lapButton = (Button) findViewById(R.id.chrono_lap_button);
 		
 		tabs = (TabHost) findViewById(android.R.id.tabhost);
-		tabs.setup();
 		
-		TabSpec lapTab = tabs.newTabSpec("0");
-		lapTab.setContent(R.id.tab1);
-		lapTab.setIndicator("Laps");
-		tabs.addTab(lapTab);
+		/**
+		 * check to see if it is a large device
+		 */
+		isDualPane = tabs == null;
 		
-		TabSpec elapsedTab = tabs.newTabSpec("1");
-		elapsedTab.setContent(R.id.tab2);
-		elapsedTab.setIndicator("Elapsed");
-		tabs.addTab(elapsedTab);
-		
-		tabs.setBackgroundColor(Color.BLACK);
-		tabs.setOnTabChangedListener(new OnTabChangeListener(){
-
-			@Override
-			public void onTabChanged(String tabId) {
-				// TODO Auto-generated method stub
-				int intTabId = Integer.parseInt(tabId);
-				syncFragmentScrolls();
-				viewPager.setCurrentItem(intTabId);
-				
-				
-			}});
+		/**
+		 * small device layout
+		 */
+		if(isDualPane == false){
+			tabs.setup(); 
+			
+			TabSpec lapTab = tabs.newTabSpec("0");
+			lapTab.setContent(R.id.tab1);
+			lapTab.setIndicator("Laps");
+			tabs.addTab(lapTab);
+			
+			TabSpec elapsedTab = tabs.newTabSpec("1");
+			elapsedTab.setContent(R.id.tab2);
+			elapsedTab.setIndicator("Elapsed");
+			tabs.addTab(elapsedTab);
+			
+			tabs.setBackgroundColor(Color.BLACK);
+			tabs.setOnTabChangedListener(new OnTabChangeListener(){
 	
-	
-		lapPagerAdapter = new LapPagerAdapter(getSupportFragmentManager());
+				@Override
+				public void onTabChanged(String tabId) {
+					int intTabId = Integer.parseInt(tabId);
+					syncFragmentScrolls();
+					viewPager.setCurrentItem(intTabId);					
+				}});
 		
-		viewPager = (ViewPager) findViewById(R.id.swipe_panel_pager);
-		viewPager.setAdapter(lapPagerAdapter);
-		viewPager.setOnPageChangeListener(new OnPageChangeListener(){
-
-			@Override
-			public void onPageScrollStateChanged(int arg0) {
-				// TODO Auto-generated method stub
-								
-				syncFragmentScrolls();
-				
-			}
-
-			@Override
-			public void onPageScrolled(int arg0, float arg1, int arg2) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void onPageSelected(int arg0) {
-				// TODO Auto-generated method stub
-				tabs.setCurrentTab(arg0);
-		}});// end of OnPageChangeListener
-				
+			lapPagerAdapter = new LapPagerAdapter(getSupportFragmentManager());
+			
+			viewPager = (ViewPager) findViewById(R.id.swipe_panel_pager);
+			viewPager.setAdapter(lapPagerAdapter);
+			viewPager.setOnPageChangeListener(new OnPageChangeListener(){
+	
+				@Override
+				public void onPageScrollStateChanged(int arg0) {
+					syncFragmentScrolls();
+				}
+	
+				@Override
+				public void onPageScrolled(int arg0, float arg1, int arg2) {}
+	
+				@Override
+		 		public void onPageSelected(int arg0) {
+					tabs.setCurrentTab(arg0);
+			}});// end of OnPageChangeListener
+		}
+		else{
+			/**
+			 * Dual Pane Layout
+			 * Set the beginning start message when the Activity is created
+			 */
+			LinearLayout linearLayout = (LinearLayout)findViewById(R.id.lap_label_layout);
+			TextView tv = new TextView(this);
+			tv.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+			tv.setText("Press Start to Start the Timer");
+			tv.setTextSize(getResources().getDimension(R.dimen.main_banner_text_dimension));
+			tv.setTextColor(Color.WHITE);
+			tv.setGravity(Gravity.CENTER);
+			linearLayout.addView(tv);
+		}
 		setButtonOnClickListeners();		
 	}
 	
@@ -115,6 +130,9 @@ public class MainActivity extends FragmentActivity {
 	public LapFragment getLapFragment(){
 		
 		LapFragment lapFrag = (LapFragment) getSupportFragmentManager().findFragmentByTag("android:switcher:"+R.id.swipe_panel_pager+":0");
+		if(lapFrag == null){
+			lapFrag = (LapFragment) getSupportFragmentManager().findFragmentById(R.id.lap_fragment);
+		}
 		return lapFrag;
 	}
 
@@ -122,6 +140,9 @@ public class MainActivity extends FragmentActivity {
 	public ElapsedFragment getElapsedFragment(){
 		
 		ElapsedFragment elapsedFrag = (ElapsedFragment) getSupportFragmentManager().findFragmentByTag("android:switcher:"+R.id.swipe_panel_pager+":1");
+		if(elapsedFrag == null){
+			elapsedFrag = (ElapsedFragment) getSupportFragmentManager().findFragmentById(R.id.elapsed_fragment);
+		}
 		return elapsedFrag;
 	}
 	
@@ -194,12 +215,14 @@ public class MainActivity extends FragmentActivity {
 					 * In this case it would be "press lap button to record laps"
 					 */
 					if(hasLap == false){
-						LapFragment lapFrag = getLapFragment();
-						ElapsedFragment elapsedFrag = getElapsedFragment();
-						lapFrag.resetDefaultLaps(running);
-						elapsedFrag.resetDefaultView(running);
+						resetLapWindows();
+						if(isDualPane == true){
+							LinearLayout ll = (LinearLayout) findViewById(R.id.lap_label_layout);
+							TextView tv = (TextView) ll.getChildAt(0);
+							tv.setText("Press Lap Button to Record Lap"); 
+						}						
 					}
-					chrono.start();					
+					chrono.start();
 				}
 		}});
 		
@@ -209,26 +232,30 @@ public class MainActivity extends FragmentActivity {
 			@Override
 			public void onClick(View v) {
 				
-				chrono.stop();
-				
-				/**
-				 * Record the time at which the time has been stopped so 
-				 * if the timer is started it can adjust for the time passed
-				 * while paused
-				 */
-				startPause = SystemClock.elapsedRealtime();
-				running = false;
-				
-				/**
-				 * If no laps have been recorded switch message in view to its
-				 * proper state:
-				 * In this case it would be "press start button to start timer"
-				 */
-				if(hasLap == false){
-					LapFragment lapFrag = getLapFragment();
-					lapFrag.resetDefaultLaps(running);
-					ElapsedFragment elapsedFrag = getElapsedFragment();
-					elapsedFrag.resetDefaultView(running);
+				if(running){
+					chrono.stop();
+					
+					/**
+					 * Record the time at which the time has been stopped so 
+					 * if the timer is started it can adjust for the time passed
+					 * while paused
+					 */
+					startPause = SystemClock.elapsedRealtime();
+					running = false;
+					
+					/**
+					 * If no laps have been recorded switch message in view to its
+					 * proper state:
+					 * In this case it would be "press start button to start timer"
+					 */
+					if(hasLap == false){
+						resetLapWindows();
+						if(isDualPane){
+							LinearLayout ll = (LinearLayout) findViewById(R.id.lap_label_layout);
+							TextView tv = (TextView) ll.getChildAt(0);
+							tv.setText("Press Start to Start the Timer");
+						}
+					}
 				}
 			}});
 		
@@ -250,11 +277,24 @@ public class MainActivity extends FragmentActivity {
 				 * the state of which depends on if the chronometer is still 
 				 * running or if it is stopped.	
 				 */
-				LapFragment lapFrag = getLapFragment();
-				lapFrag.resetDefaultLaps(running);
-				ElapsedFragment elapsedFrag = getElapsedFragment();
-				elapsedFrag.resetDefaultView(running);
-								
+				resetLapWindows();
+				if(isDualPane){
+					LinearLayout ll = (LinearLayout) findViewById(R.id.lap_label_layout);
+					ll.removeAllViews();
+					TextView tv = new TextView(getBaseContext());
+					tv.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+					tv.setTextSize(getResources().getDimension(R.dimen.main_banner_text_dimension));
+					tv.setTextColor(Color.WHITE);
+					tv.setGravity(Gravity.CENTER);
+					if(running){
+						tv.setText("Press Lap Button to Record Lap");
+					}
+					else
+						tv.setText("Press Start to Start the Timer");
+					
+					ll.addView(tv);
+				}
+				
 				lapNumber  = 1; // reset the lap number back to 1
 				firstRun = true; // reset to first run since reset
 				hasLap = false; // restet to having no laps recorded
@@ -270,24 +310,50 @@ public class MainActivity extends FragmentActivity {
 				if(running == true){
 					
 					String timeString = chrono.getText().toString();
-					//Log.d("timeString", timeString);
 					LapFragment lapFrag = getLapFragment();
 					ElapsedFragment elapsedFrag = getElapsedFragment();
 					
 					if(lapNumber == 1){
 						lapFrag.removeAllLaps();
 						elapsedFrag.removeAllLaps();
+						if(isDualPane){
+							LinearLayout ll = (LinearLayout) findViewById(R.id.lap_label_layout);
+							ll.removeAllViews();
+							TextView tv = null;
+							for(int i=0; i < 2; ++i){
+								tv = new TextView(getBaseContext());
+								tv.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, 1f));
+								tv.setTextSize(getResources().getDimension(R.dimen.main_banner_text_dimension));
+								tv.setTextColor(Color.WHITE);
+								tv.setGravity(Gravity.CENTER);
+								ll.addView(tv);
+							}
+							tv = (TextView)ll.getChildAt(0);
+							tv.setText("Lap Time");
+							tv = (TextView)ll.getChildAt(1);
+							tv.setText("Elapsed Time");							
+						}
 					}
 					
 					lapFrag.addLap(timeString, lapNumber);
 					elapsedFrag.addLaps(timeString, lapNumber);
 										
 					lapNumber++;
-					
-					//firstRun = false;
 					hasLap = true;
 				}
 			}});
+	}
+	
+	//---------------------------------------------------------------------------
+	public boolean getIsDualPane(){
+		return isDualPane;
+	}
+	//---------------------------------------------------------------------------
+	public void resetLapWindows(){
+		LapFragment lapFrag = getLapFragment();
+		lapFrag.resetDefaultLaps(running);
+		ElapsedFragment elapsedFrag = getElapsedFragment();
+		elapsedFrag.resetDefaultView(running);		
 	}
 	
 	//----------------------------------------------------------------------------
@@ -297,5 +363,4 @@ public class MainActivity extends FragmentActivity {
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
 	}
-
 }

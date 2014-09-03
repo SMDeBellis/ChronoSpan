@@ -2,6 +2,7 @@ package com.SDRockstarStudios.stopwatch;
 
 import java.util.Locale;
 
+import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -18,7 +19,10 @@ public class ElapsedFragment extends Fragment {
 	
 	ScrollView scrollView = null;
 	LinearLayout linearLayout = null;
+	boolean isDualPane = false;
+	
 	private static String lastRecordedTime = "00:00:00:00"; 
+	
 	public ElapsedFragment() {
 		// Required empty public constructor
 	}
@@ -32,17 +36,32 @@ public class ElapsedFragment extends Fragment {
 		scrollView = (ScrollView) layoutView.findViewById(R.id.elapsed_frag_scroll_view);
 		linearLayout = (LinearLayout) layoutView.findViewById(R.id.elapsed_time_linear_layout);
 				
-		TextView startingTextView = null;
-		startingTextView = new TextView(getActivity());
-		startingTextView.setText("Press Start to Start the Timer");
-		startingTextView.setTextColor(Color.WHITE);
-		startingTextView.setTextSize(40);
-		startingTextView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-		startingTextView.setGravity(Gravity.CENTER);
 		
-		linearLayout.addView(startingTextView);		
 		
 		return layoutView;
+	}
+	
+	//------------------------------------------------------
+	@SuppressLint("NewApi")
+	public void onActivityCreated(Bundle savedInstanceState) {
+		// TODO Auto-generated method stub
+		super.onActivityCreated(savedInstanceState);
+		isDualPane = ((MainActivity)getActivity()).getIsDualPane();
+		if(isDualPane == false){
+			TextView startingTextView = null;
+			startingTextView = new TextView(getActivity());
+			startingTextView.setText("Press Start to Start the Timer");
+			startingTextView.setTextColor(Color.WHITE);
+			startingTextView.setTextSize(40);
+			startingTextView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+			startingTextView.setGravity(Gravity.CENTER);
+			linearLayout.addView(startingTextView);
+			scrollView.setBackground(getResources().getDrawable(R.drawable.rounded_view_small));
+		}
+		else{
+			scrollView.setBackgroundColor(getResources().getColor(R.color.black));
+		}
+		
 	}
 	
 	//---------------------------------------------------
@@ -141,19 +160,19 @@ public class ElapsedFragment extends Fragment {
 		
 		TextView startingTextView = (TextView) new TextView(getActivity());
 		
+		if(isDualPane == false){
+			if(timerIsRunning){
+				startingTextView.setText("Press Lap Button to Record Lap");
+			}
+			else
+				startingTextView.setText("Press Start to Start the Timer");
 		
-		if(timerIsRunning){
-			startingTextView.setText("Press Lap Button to Record Lap");
+			startingTextView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+			startingTextView.setGravity(Gravity.CENTER);
+			startingTextView.setTextColor(Color.WHITE);
+			startingTextView.setTextSize(40);
+		
+			linearLayout.addView(startingTextView);
 		}
-		else
-			startingTextView.setText("Press Start to Start the Timer");
-		
-		startingTextView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-		startingTextView.setGravity(Gravity.CENTER);
-		startingTextView.setTextColor(Color.WHITE);
-		startingTextView.setTextSize(40);
-		
-		linearLayout.addView(startingTextView);
 	}
-
 }

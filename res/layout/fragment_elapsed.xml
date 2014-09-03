@@ -11,7 +11,6 @@
         android:id="@+id/elapsed_frag_scroll_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent" 
-        android:background="@drawable/rounded_view"
         android:layout_gravity="center_horizontal" >
         
         <LinearLayout
@@ -19,12 +18,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:background="@drawable/rounded_view"
             android:orientation="vertical" >
-        </LinearLayout>
-            
-            
-            
+        </LinearLayout>            
       </ScrollView>
     
 </FrameLayout>

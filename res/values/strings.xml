@@ -9,9 +9,12 @@
     <string name="chrono_stop_button_string">Stop</string>
     <string name="chrono_reset_button_string">Reset</string>
     <string name="chrono_lap_button_string">Lap</string>
-    <string name="chrono_format_string">00:00:00</string>
+    <string name="chrono_format_string">00:00:00:00</string>
     <string name="default_lap_time_string">Press Start To Begin</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_start_screen">ChronoSpan</string>
+    
+    <string name="lapTextViewText">Lap Time</string>
+	<string name="elapsedTextViewText">Elapsed Time</string>  
     
 </resources>

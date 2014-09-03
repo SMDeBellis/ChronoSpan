@@ -1,8 +1,11 @@
 package com.SDRockstarStudios.stopwatch;
 
+import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +24,8 @@ public class LapFragment extends Fragment {
 	ScrollView scrollView = null;
 	LinearLayout linearLayout = null;
 	
+	boolean isDualPane = false;
+	
 	public LapFragment() {
 		// Required empty public constructor
 	}
@@ -33,18 +38,41 @@ public class LapFragment extends Fragment {
 		
 		scrollView = (ScrollView) layoutView.findViewById(R.id.lap_frag_scroll_view);
 		linearLayout = (LinearLayout) layoutView.findViewById(R.id.lap_frag_linear_layout);
+			
 				
-		TextView startingTextView = null;
-		startingTextView = new TextView(getActivity());
-		startingTextView.setText("Press Start to Start the Timer");
-		startingTextView.setTextColor(Color.WHITE);
-		startingTextView.setTextSize(40);
-		startingTextView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-		startingTextView.setGravity(Gravity.CENTER);
-		
-		linearLayout.addView(startingTextView);		
 		
 		return layoutView;
+	}
+
+	
+	@Override
+	public void onAttach(Activity activity) {
+		// TODO Auto-generated method stub
+		super.onAttach(activity);
+		
+	}
+
+	@SuppressLint("NewApi")
+	@Override
+	public void onActivityCreated(Bundle savedInstanceState) {
+		// TODO Auto-generated method stub
+		super.onActivityCreated(savedInstanceState);
+		isDualPane = ((MainActivity)getActivity()).getIsDualPane();
+		Log.d("onActivityCreated", String.valueOf(isDualPane));
+		if(isDualPane == false){
+			TextView startingTextView = null;
+			startingTextView = new TextView(getActivity());
+			startingTextView.setText("Press Start to Start the Timer");
+			startingTextView.setTextColor(Color.WHITE);
+			startingTextView.setTextSize(40);
+			startingTextView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+			startingTextView.setGravity(Gravity.CENTER);
+			linearLayout.addView(startingTextView);
+			scrollView.setBackground(getResources().getDrawable(R.drawable.rounded_view_small));
+		}
+		else{
+			scrollView.setBackgroundColor(getResources().getColor(R.color.black));
+		}
 	}
 
 	//------------------------------------------------------------------------
@@ -89,6 +117,15 @@ public class LapFragment extends Fragment {
 	}
 	
 	//------------------------------------------------------------
+	public void setFragmentText(String toAdd, int color, int size){
+		TextView startingTextView = (TextView) new TextView(getActivity());
+		startingTextView.setText(toAdd);
+		startingTextView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+		startingTextView.setGravity(Gravity.CENTER);
+		startingTextView.setTextColor(color);
+		startingTextView.setTextSize(size);
+	}
+	//------------------------------------------------------------
 	public void removeAllLaps(){
 		
 		linearLayout.removeAllViews();
@@ -101,20 +138,21 @@ public class LapFragment extends Fragment {
 		
 		TextView startingTextView = (TextView) new TextView(getActivity());
 		
-		
-		if(timerIsRunning){
-			startingTextView.setText("Press Lap Button to Record Lap");
+		if(isDualPane == false){
+			if(timerIsRunning){
+				startingTextView.setText("Press Lap Button to Record Lap");
+			}
+			else
+				startingTextView.setText("Press Start to Start the Timer");
+			
+			startingTextView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+			startingTextView.setGravity(Gravity.CENTER);
+			startingTextView.setTextColor(Color.WHITE);
+			startingTextView.setTextSize(40);
+			
+			linearLayout.addView(startingTextView);
 		}
-		else
-			startingTextView.setText("Press Start to Start the Timer");
-		
-		startingTextView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-		startingTextView.setGravity(Gravity.CENTER);
-		startingTextView.setTextColor(Color.WHITE);
-		startingTextView.setTextSize(40);
-		
-		linearLayout.addView(startingTextView);
-		
+	
 	}
 			
 }
